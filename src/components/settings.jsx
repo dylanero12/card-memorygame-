@@ -9,7 +9,7 @@ const Settings = ({ onUpdateCardPool }) => {
   useEffect(() => {
     const fetchAllCharacters = async () => {
       try {
-        const response = await fetch('http://localhost:3003/api/characters');
+        const response = await fetch('https://apiforcards.vercel.app/api/characters');
         const data = await response.json();
         setAllCharacters(data);
         const savedSelection = localStorage.getItem('selectedCards');
