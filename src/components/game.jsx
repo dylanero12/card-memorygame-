@@ -52,7 +52,7 @@ const Game = ({ activeCardIds }) => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch('https://apiforcards.vercel.app/api/characters');
+      const response = await fetch('https://apiforcards-k9iu.vercel.app/api/characters');
       const data = await response.json();
       
       // Filter characters based on activeCardIds
