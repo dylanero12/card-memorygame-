@@ -53,9 +53,12 @@
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  padding: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  padding: 10px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .cards-grid .card {
@@ -65,7 +68,7 @@
 .card {
   border: 1px solid #ccc;
   border-radius: 8px;
-  padding: 10px;
+  padding: 5px;
   cursor: pointer;
   transition: transform 0.2s;
   display: flex;
@@ -88,15 +91,15 @@
 }
 
 .card h3 {
-  margin: 10px 0;
-  font-size: 1rem;
+  margin: 5px 0;
+  font-size: 0.9rem;
 }
 
 .score-board {
   display: flex;
   justify-content: space-around;
-  padding: 20px;
-  font-size: 1.2rem;
+  padding: 10px;
+  font-size: 1rem;
   background-color: #f5f5f5;
   border-radius: 8px;
   margin-bottom: 20px;
@@ -104,7 +107,7 @@
 }
 
 .current-score, .best-score {
-  padding: 10px;
+  padding: 5px;
   font-weight: bold;
   color: #333;
 }
@@ -140,15 +143,17 @@
 }
 
 .restart-button {
+  position: sticky;
+  bottom: 10px;
+  margin: 1rem auto;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
   background-color: #3498db;
   color: white;
   border: none;
-  padding: 1rem 2rem;
   border-radius: 4px;
-  font-size: 1.1rem;
   cursor: pointer;
   transition: background-color 0.2s;
-  margin-top: 1rem;
 }
 
 .restart-button:hover {
@@ -160,13 +165,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
+  padding: 1rem;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  overflow: hidden;
+  overflow-y: auto;
   background-color: black;
 }
 
@@ -182,7 +187,7 @@
 
 .loss-content {
   background-color: rgba(0, 0, 0, 0.9);
-  padding: 2rem;
+  padding: 1.5rem;
   border-radius: 8px;
   max-width: 600px;
   width: 90%;
@@ -190,24 +195,27 @@
   text-align: center;
   z-index: 1;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  margin: auto;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .loss-content h2 {
   color: #ff4444;
   margin-bottom: 1rem;
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 
 .loss-content h3 {
   color: #fff;
   margin-bottom: 1rem;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 
 .character-description {
-  margin: 1.5rem 0;
+  margin: 1rem 0;
   line-height: 1.6;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #ddd;
 }
 
@@ -490,11 +498,12 @@
   margin: 1rem auto;
   color: #888;
   line-height: 1.4;
+  padding: 0 10px;
 }
 
 .game-instructions p {
   margin: 0.5rem 0;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
 }
 
 .game-instructions p:first-child {
@@ -544,4 +553,51 @@ img {
 
 .mute-button:active {
   transform: scale(0.95);
+}
+
+/* Adjust text sizes for mobile */
+@media (max-width: 768px) {
+  .loss-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .loss-content h3 {
+    font-size: 1.2rem;
+  }
+
+  .character-description {
+    font-size: 1rem;
+    margin: 1rem 0;
+  }
+}
+
+/* Adjust card sizes for mobile */
+@media (max-width: 768px) {
+  .card {
+    padding: 5px;
+  }
+
+  .card h3 {
+    font-size: 0.9rem;
+    margin: 5px 0;
+  }
+
+  /* Adjust score display for mobile */
+  .score-board {
+    padding: 10px;
+    font-size: 1rem;
+  }
+
+  .current-score, .best-score {
+    padding: 5px;
+  }
+
+  /* Adjust game instructions for mobile */
+  .game-instructions {
+    padding: 0 10px;
+  }
+
+  .game-instructions p {
+    font-size: 0.9rem;
+  }
 }
