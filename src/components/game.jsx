@@ -3,6 +3,7 @@ import Card from './cards';
 import Score from './score';
 import PropTypes from 'prop-types';
 import AudioPlayer from './audio';
+import VideoTransition from './videoTransition';
 
 const Game = ({ activeCardIds }) => {
   const [allCharacters, setAllCharacters] = useState([]);
@@ -14,6 +15,8 @@ const Game = ({ activeCardIds }) => {
   const [error, setError] = useState(null);
   const [hasWon, setHasWon] = useState(false);
   const [lossInfo, setLossInfo] = useState(null);
+  const [showVideo, setShowVideo] = useState(false);
+  const [showLossScreen, setShowLossScreen] = useState(false);
 
   const MAX_CARDS = 10;
 
@@ -88,6 +91,12 @@ const Game = ({ activeCardIds }) => {
       // Game Over - card was clicked twice
       const losingCard = allCharacters.find(char => char.id === cardId);
       setLossInfo(losingCard);
+      
+      if (losingCard.defeatVideo) {
+        setShowVideo(true);
+      } else {
+        setShowLossScreen(true);
+      }
     } else {
       const newClickedCards = [...clickedCards, cardId];
       setClickedCards(newClickedCards);
@@ -104,6 +113,11 @@ const Game = ({ activeCardIds }) => {
         setDisplayedCharacters(getRandomCharacters(allCharacters, MAX_CARDS, newClickedCards));
       }
     }
+  };
+
+  const handleVideoEnd = () => {
+    setShowVideo(false);
+    setShowLossScreen(true);
   };
 
   if (isLoading) {
@@ -127,8 +141,16 @@ const Game = ({ activeCardIds }) => {
     );
   }
 
-  if (lossInfo) {
-    console.log('Defeat Music URL:', lossInfo.defeatMusic);
+  if (showVideo && lossInfo?.defeatVideo) {
+    return (
+      <VideoTransition 
+        videoUrl={lossInfo.defeatVideo}
+        onTransitionEnd={handleVideoEnd}
+      />
+    );
+  }
+
+  if (showLossScreen && lossInfo) {
     return (
       <div className="loss-screen">
         {lossInfo.defeatMusic && <AudioPlayer musicUrl={lossInfo.defeatMusic} />}
