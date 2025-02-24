@@ -55,11 +55,22 @@ const Game = ({ activeCardIds }) => {
     try {
       setIsLoading(true);
       setError(null);
+
+      // First try to verify API is running
+      const healthCheck = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/', {
+        method: 'GET',
+        mode: 'cors'
+      });
+
+      if (!healthCheck.ok) {
+        throw new Error('API health check failed');
+      }
+
+      // Then fetch characters
       const response = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/api/characters', {
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         mode: 'cors'
       });
@@ -69,6 +80,11 @@ const Game = ({ activeCardIds }) => {
       }
       
       const data = await response.json();
+      console.log('Fetched characters:', data); // Debug log
+      
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid data format received');
+      }
       
       // Filter characters based on activeCardIds
       const filteredData = activeCardIds 
@@ -76,14 +92,19 @@ const Game = ({ activeCardIds }) => {
         : data;
       
       setAllCharacters(filteredData);
-      setDisplayedCharacters(getRandomCharacters(filteredData, MAX_CARDS, []));
+      
+      if (filteredData.length > 0) {
+        setDisplayedCharacters(getRandomCharacters(filteredData, Math.min(MAX_CARDS, filteredData.length), []));
+      } else {
+        setError('No characters available to display');
+      }
     } catch (error) {
-      setError('Failed to load characters. Please try again later.');
-      console.error('Error:', error);
+      console.error('Fetch error:', error);
+      setError(`Failed to load characters: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
-  }, [activeCardIds]);
+  }, [activeCardIds, getRandomCharacters]);
 
   useEffect(() => {
     fetchCharacters();
