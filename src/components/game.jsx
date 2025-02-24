@@ -90,11 +90,14 @@ const Game = ({ activeCardIds }) => {
     if (clickedCards.includes(cardId)) {
       // Game Over - card was clicked twice
       const losingCard = allCharacters.find(char => char.id === cardId);
+      console.log('Losing card:', losingCard);
       setLossInfo(losingCard);
       
       if (losingCard.defeatVideo) {
+        console.log('Playing defeat video:', losingCard.defeatVideo);
         setShowVideo(true);
       } else {
+        console.log('No defeat video, showing loss screen');
         setShowLossScreen(true);
       }
     } else {
