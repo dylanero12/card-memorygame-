@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-const apiUrl = 'https://apiforcards-k9iu-git-testvideosendpoint-dylanero12s-projects.vercel.app';
+const apiUrl = 'https://apiforcards-k9iu.vercel.app';
 
 const Settings = ({ onUpdateCardPool }) => {
   const [isOpen, setIsOpen] = useState(false);
