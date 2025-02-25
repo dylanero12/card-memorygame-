@@ -55,89 +55,23 @@ const Game = ({ activeCardIds }) => {
     try {
       setIsLoading(true);
       setError(null);
-
-      const response = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/api/characters', {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        cache: 'no-cache',
-        credentials: 'omit',
-        mode: 'cors'
-      });
+      const response = await fetch('https://apiforcards-k9iu.vercel.app/api/characters');
+      const data = await response.json();
       
-      if (!response.ok) {
-        console.error('Response not ok:', {
-          status: response.status,
-          statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries())
-        });
-        const text = await response.text();
-        console.log('Response text:', text);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      // Clone the response before reading it
-      const responseClone = response.clone();
+      // Filter characters based on activeCardIds
+      const filteredData = activeCardIds 
+        ? data.filter(char => activeCardIds.includes(char.id))
+        : data;
       
-      try {
-        const data = await response.json();
-        console.log('Raw API response:', data);
-        
-        // Ensure we're working with an array
-        const charactersArray = Array.isArray(data) ? data : [];
-        console.log('Characters array:', charactersArray);
-        
-        // Filter characters based on activeCardIds
-        const filteredData = activeCardIds 
-          ? charactersArray.filter(char => activeCardIds.includes(char.id))
-          : charactersArray;
-        
-        console.log('Filtered characters:', filteredData);
-        
-        if (filteredData.length === 0) {
-          console.warn('No characters available after filtering');
-          setError('No characters available to display');
-          return;
-        }
-        
-        setAllCharacters(filteredData);
-        const randomChars = getRandomCharacters(filteredData, Math.min(MAX_CARDS, filteredData.length), []);
-        console.log('Random characters selected:', randomChars);
-        setDisplayedCharacters(randomChars);
-        
-      } catch (parseError) {
-        console.error('JSON parse error:', parseError);
-        // Try to read the cloned response as text for debugging
-        const text = await responseClone.text();
-        console.log('Raw response text:', text);
-        throw new Error('Failed to parse response as JSON');
-      }
-      
+      setAllCharacters(filteredData);
+      setDisplayedCharacters(getRandomCharacters(filteredData, MAX_CARDS, []));
     } catch (error) {
-      console.error('Fetch error details:', error);
-      setError(`Failed to load characters: ${error.message}`);
+      setError('Failed to load characters. Please try again later.');
+      console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [activeCardIds, getRandomCharacters]);
-
-  // Add debug effect for state changes
-  useEffect(() => {
-    console.log('Current game state:', {
-      allCharacters: allCharacters.length,
-      displayedCharacters: displayedCharacters.length,
-      clickedCards,
-      currentScore,
-      bestScore,
-      isLoading,
-      error,
-      hasWon,
-      showVideo,
-      showLossScreen
-    });
-  }, [allCharacters, displayedCharacters, clickedCards, currentScore, bestScore, isLoading, error, hasWon, showVideo, showLossScreen]);
+  }, [activeCardIds]);
 
   useEffect(() => {
     fetchCharacters();
@@ -156,14 +90,11 @@ const Game = ({ activeCardIds }) => {
     if (clickedCards.includes(cardId)) {
       // Game Over - card was clicked twice
       const losingCard = allCharacters.find(char => char.id === cardId);
-      console.log('Losing card:', losingCard);
       setLossInfo(losingCard);
       
       if (losingCard.defeatVideo) {
-        console.log('Playing defeat video:', losingCard.defeatVideo);
         setShowVideo(true);
       } else {
-        console.log('No defeat video, showing loss screen');
         setShowLossScreen(true);
       }
     } else {
