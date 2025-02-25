@@ -57,7 +57,7 @@ const Game = ({ activeCardIds }) => {
       setError(null);
       console.log('Fetching characters...');
       
-      const response = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/api/characters', {
+      const response = await fetch('https://apiforcards-k9iu-1rjl4gc8u-dylanero12s-projects.vercel.app/api/characters', {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
@@ -123,7 +123,21 @@ const Game = ({ activeCardIds }) => {
       
       if (losingCard.defeatVideo) {
         console.log('Playing defeat video:', losingCard.defeatVideo);
-        setShowVideo(true);
+        // Verify video URL is accessible
+        fetch(losingCard.defeatVideo)
+          .then(response => {
+            console.log('Video response:', response.status, response.statusText);
+            if (!response.ok) {
+              console.error('Video URL not accessible');
+              setShowLossScreen(true);
+              return;
+            }
+            setShowVideo(true);
+          })
+          .catch(error => {
+            console.error('Error checking video URL:', error);
+            setShowLossScreen(true);
+          });
       } else {
         console.log('No defeat video, showing loss screen');
         setShowLossScreen(true);

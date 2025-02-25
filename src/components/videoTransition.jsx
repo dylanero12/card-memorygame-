@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 const VideoTransition = ({ videoUrl, onTransitionEnd }) => {
   const [isPlaying, setIsPlaying] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     const video = document.getElementById('transition-video');
@@ -12,22 +13,40 @@ const VideoTransition = ({ videoUrl, onTransitionEnd }) => {
       onTransitionEnd();
     };
 
+    const handleError = (e) => {
+      console.error('Video loading error:', e);
+      setLoadError(true);
+      onTransitionEnd(); // Skip to loss screen if video fails
+    };
+
     if (video) {
       video.addEventListener('ended', handleEnded);
+      video.addEventListener('error', handleError);
+
+      // Log video element state
+      console.log('Video element:', {
+        url: videoUrl,
+        readyState: video.readyState,
+        networkState: video.networkState,
+        error: video.error
+      });
+
       // Ensure video plays
       video.play().catch(error => {
         console.error('Video playback failed:', error);
+        handleError(error);
       });
     }
 
     return () => {
       if (video) {
         video.removeEventListener('ended', handleEnded);
+        video.removeEventListener('error', handleError);
       }
     };
-  }, [onTransitionEnd]);
+  }, [videoUrl, onTransitionEnd]);
 
-  if (!isPlaying) return null;
+  if (loadError || !isPlaying) return null;
 
   return (
     <div className="video-transition" style={{
@@ -43,13 +62,14 @@ const VideoTransition = ({ videoUrl, onTransitionEnd }) => {
         id="transition-video"
         src={videoUrl}
         autoPlay
-        muted
         playsInline
         style={{
           width: '100%',
           height: '100%',
           objectFit: 'contain'
         }}
+        onLoadStart={() => console.log('Video load started')}
+        onLoadedData={() => console.log('Video data loaded')}
       />
     </div>
   );
