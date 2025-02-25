@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+const apiUrl = 'https://apiforcards-git-messingaroundwithvideos-dylanero12s-projects.vercel.app';
 
 const Settings = ({ onUpdateCardPool }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,7 +10,7 @@ const Settings = ({ onUpdateCardPool }) => {
   useEffect(() => {
     const fetchAllCharacters = async () => {
       try {
-        const response = await fetch('https://apiforcards-k9iu-28vygrif9-dylanero12s-projects.vercel.app/api/characters', {
+        const response = await fetch(apiUrl + '/api/characters', {
           method: 'GET',
           mode: 'cors',
           credentials: 'omit',

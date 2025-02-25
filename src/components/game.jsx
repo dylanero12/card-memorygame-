@@ -4,6 +4,7 @@ import Score from './score';
 import PropTypes from 'prop-types';
 import AudioPlayer from './audio';
 import VideoTransition from './videoTransition';
+const apiUrl = 'https://apiforcards-git-messingaroundwithvideos-dylanero12s-projects.vercel.app';
 
 const Game = ({ activeCardIds }) => {
   const [allCharacters, setAllCharacters] = useState([]);
@@ -55,9 +56,9 @@ const Game = ({ activeCardIds }) => {
     try {
       setIsLoading(true);
       setError(null);
-      console.log('Fetching characters from:', 'https://apiforcards-k9iu-28vygrif9-dylanero12s-projects.vercel.app/api/characters');
+      console.log('Fetching characters from:', apiUrl+"/api/characters");
       
-      const response = await fetch('https://apiforcards-k9iu-28vygrif9-dylanero12s-projects.vercel.app/api/characters', {
+      const response = await fetch(apiUrl+"/api/characters", {
         method: 'GET',
         mode: 'cors',
         credentials: 'omit',
@@ -168,7 +169,7 @@ const Game = ({ activeCardIds }) => {
   if (showLossScreen && lossInfo) {
     return (
       <div className="loss-screen">
-        {lossInfo.defeatMusic && <AudioPlayer musicUrl={lossInfo.defeatMusic} />}
+        {apiUrl + lossInfo.defeatMusic && <AudioPlayer musicUrl={lossInfo.defeatMusic} />}
         <img 
           src={lossInfo.imageUrl} 
           alt={`${lossInfo.name}`}
