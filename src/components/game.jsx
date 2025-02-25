@@ -57,17 +57,12 @@ const Game = ({ activeCardIds }) => {
       setError(null);
       console.log('Fetching characters...');
       
-      // Use a CORS proxy if needed
-      const corsProxy = 'https://cors-anywhere.herokuapp.com/';
-      const apiUrl = 'https://apiforcards-k9iu-1rjl4gc8u-dylanero12s-projects.vercel.app/api/characters';
-      
-      const response = await fetch(corsProxy + apiUrl, {
+      const response = await fetch('https://apiforcards-k9iu-1rjl4gc8u-dylanero12s-projects.vercel.app/data/characters.json', {
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Origin': window.location.origin
-        }
+          'Accept': 'application/json'
+        },
+        mode: 'cors'
       });
 
       if (!response.ok) {
@@ -79,7 +74,7 @@ const Game = ({ activeCardIds }) => {
       console.log('Raw API Response:', responseData);
       
       // Extract the characters array from the response
-      const data = responseData.characters || responseData;
+      const data = responseData.characters;
       
       if (!data || !Array.isArray(data)) {
         console.error('Invalid data format:', data);
@@ -131,7 +126,10 @@ const Game = ({ activeCardIds }) => {
       if (losingCard.defeatVideo) {
         console.log('Playing defeat video:', losingCard.defeatVideo);
         // Verify video URL is accessible
-        fetch(losingCard.defeatVideo)
+        fetch(losingCard.defeatVideo, {
+          method: 'HEAD',
+          mode: 'cors'
+        })
           .then(response => {
             console.log('Video response:', response.status, response.statusText);
             if (!response.ok) {
