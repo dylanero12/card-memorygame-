@@ -56,55 +56,70 @@ const Game = ({ activeCardIds }) => {
       setIsLoading(true);
       setError(null);
 
-      // First try to verify API is running
-      const healthCheck = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/', {
-        method: 'GET',
-        mode: 'cors'
-      });
-
-      if (!healthCheck.ok) {
-        throw new Error('API health check failed');
-      }
-
-      // Then fetch characters
+      // Then fetch characters directly (skip health check since we know API works)
       const response = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/api/characters', {
         method: 'GET',
         headers: {
-          'Accept': 'application/json'
-        },
-        mode: 'cors'
+          'Accept': 'application/json',
+          'Origin': window.location.origin
+        }
       });
       
       if (!response.ok) {
+        console.error('Response not ok:', response.status, response.statusText);
+        const text = await response.text();
+        console.log('Response text:', text);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('Fetched characters:', data); // Debug log
+      console.log('Raw API response:', data); // Debug log
       
-      if (!Array.isArray(data)) {
-        throw new Error('Invalid data format received');
-      }
+      // Ensure we're working with an array
+      const charactersArray = Array.isArray(data) ? data : [];
+      console.log('Characters array:', charactersArray); // Debug log
       
       // Filter characters based on activeCardIds
       const filteredData = activeCardIds 
-        ? data.filter(char => activeCardIds.includes(char.id))
-        : data;
+        ? charactersArray.filter(char => activeCardIds.includes(char.id))
+        : charactersArray;
+      
+      console.log('Filtered characters:', filteredData); // Debug log
+      
+      if (filteredData.length === 0) {
+        console.warn('No characters available after filtering');
+        setError('No characters available to display');
+        return;
+      }
       
       setAllCharacters(filteredData);
+      const randomChars = getRandomCharacters(filteredData, Math.min(MAX_CARDS, filteredData.length), []);
+      console.log('Random characters selected:', randomChars); // Debug log
+      setDisplayedCharacters(randomChars);
       
-      if (filteredData.length > 0) {
-        setDisplayedCharacters(getRandomCharacters(filteredData, Math.min(MAX_CARDS, filteredData.length), []));
-      } else {
-        setError('No characters available to display');
-      }
     } catch (error) {
-      console.error('Fetch error:', error);
+      console.error('Fetch error details:', error);
       setError(`Failed to load characters: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   }, [activeCardIds, getRandomCharacters]);
+
+  // Add debug effect for state changes
+  useEffect(() => {
+    console.log('Current game state:', {
+      allCharacters: allCharacters.length,
+      displayedCharacters: displayedCharacters.length,
+      clickedCards,
+      currentScore,
+      bestScore,
+      isLoading,
+      error,
+      hasWon,
+      showVideo,
+      showLossScreen
+    });
+  }, [allCharacters, displayedCharacters, clickedCards, currentScore, bestScore, isLoading, error, hasWon, showVideo, showLossScreen]);
 
   useEffect(() => {
     fetchCharacters();
