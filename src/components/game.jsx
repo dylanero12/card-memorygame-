@@ -57,7 +57,7 @@ const Game = ({ activeCardIds }) => {
       setError(null);
       console.log('Fetching characters...');
       
-      const response = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/api/characters', {
+      const response = await fetch('https://apiforcards-k9iu-1rjl4gc8u-dylanero12s-projects.vercel.app/api/characters', {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
