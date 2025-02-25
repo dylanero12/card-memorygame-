@@ -56,46 +56,64 @@ const Game = ({ activeCardIds }) => {
       setIsLoading(true);
       setError(null);
 
-      // Then fetch characters directly (skip health check since we know API works)
       const response = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/api/characters', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
-          'Origin': window.location.origin
-        }
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-cache',
+        credentials: 'omit',
+        mode: 'cors'
       });
       
       if (!response.ok) {
-        console.error('Response not ok:', response.status, response.statusText);
+        console.error('Response not ok:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries())
+        });
         const text = await response.text();
         console.log('Response text:', text);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      // Clone the response before reading it
+      const responseClone = response.clone();
       
-      const data = await response.json();
-      console.log('Raw API response:', data); // Debug log
-      
-      // Ensure we're working with an array
-      const charactersArray = Array.isArray(data) ? data : [];
-      console.log('Characters array:', charactersArray); // Debug log
-      
-      // Filter characters based on activeCardIds
-      const filteredData = activeCardIds 
-        ? charactersArray.filter(char => activeCardIds.includes(char.id))
-        : charactersArray;
-      
-      console.log('Filtered characters:', filteredData); // Debug log
-      
-      if (filteredData.length === 0) {
-        console.warn('No characters available after filtering');
-        setError('No characters available to display');
-        return;
+      try {
+        const data = await response.json();
+        console.log('Raw API response:', data);
+        
+        // Ensure we're working with an array
+        const charactersArray = Array.isArray(data) ? data : [];
+        console.log('Characters array:', charactersArray);
+        
+        // Filter characters based on activeCardIds
+        const filteredData = activeCardIds 
+          ? charactersArray.filter(char => activeCardIds.includes(char.id))
+          : charactersArray;
+        
+        console.log('Filtered characters:', filteredData);
+        
+        if (filteredData.length === 0) {
+          console.warn('No characters available after filtering');
+          setError('No characters available to display');
+          return;
+        }
+        
+        setAllCharacters(filteredData);
+        const randomChars = getRandomCharacters(filteredData, Math.min(MAX_CARDS, filteredData.length), []);
+        console.log('Random characters selected:', randomChars);
+        setDisplayedCharacters(randomChars);
+        
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        // Try to read the cloned response as text for debugging
+        const text = await responseClone.text();
+        console.log('Raw response text:', text);
+        throw new Error('Failed to parse response as JSON');
       }
-      
-      setAllCharacters(filteredData);
-      const randomChars = getRandomCharacters(filteredData, Math.min(MAX_CARDS, filteredData.length), []);
-      console.log('Random characters selected:', randomChars); // Debug log
-      setDisplayedCharacters(randomChars);
       
     } catch (error) {
       console.error('Fetch error details:', error);
