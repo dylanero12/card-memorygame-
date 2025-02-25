@@ -56,14 +56,23 @@ const Game = ({ activeCardIds }) => {
       setIsLoading(true);
       setError(null);
       console.log('Fetching characters...');
-      // Fetch directly from the JSON file instead of an API endpoint
-      const response = await fetch('https://apiforcards-k9iu-1rjl4gc8u-dylanero12s-projects.vercel.app/data/characters.json');
       
+      // Try fetching with no-cors mode
+      const response = await fetch('https://apiforcards-k9iu-1rjl4gc8u-dylanero12s-projects.vercel.app/data/characters.json', {
+        mode: 'no-cors',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      // If we can't get the data directly, use a fallback local copy
       if (!response.ok) {
-        console.error('API Response not OK:', response.status, response.statusText);
-        const text = await response.text();
-        console.error('Response text:', text);
-        throw new Error(`API responded with status ${response.status}`);
+        console.warn('Falling back to local data');
+        const localResponse = await fetch('/data/characters.json');
+        if (!localResponse.ok) {
+          throw new Error('Failed to fetch characters data');
+        }
+        return localResponse.json();
       }
 
       const responseData = await response.json();
@@ -97,7 +106,7 @@ const Game = ({ activeCardIds }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [activeCardIds]);
+  }, [activeCardIds, getRandomCharacters]);
 
   useEffect(() => {
     fetchCharacters();
