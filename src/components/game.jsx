@@ -57,7 +57,7 @@ const Game = ({ activeCardIds }) => {
       setError(null);
       console.log('Fetching characters...');
       // Fetch directly from the JSON file instead of an API endpoint
-      const response = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/data/characters.json');
+      const response = await fetch('https://apiforcards-k9iu-1rjl4gc8u-dylanero12s-projects.vercel.app/data/characters.json');
       
       if (!response.ok) {
         console.error('API Response not OK:', response.status, response.statusText);
