@@ -1,10 +1,9 @@
 import { useState, createContext, useEffect } from 'react';
-import Game from './components/game';
+import { Game, apiUrl } from './components/game';
 import Settings from './components/settings';
 import './App.css';
 
 export const AudioContext = createContext();
-const apiUrl = 'https://apiforcards-git-messingaroundwithvideos-dylanero12s-projects.vercel.app';
 
 function App() {
   const [activeCardIds, setActiveCardIds] = useState(() => {
