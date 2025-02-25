@@ -12,18 +12,44 @@ const VideoTransition = ({ videoUrl, onTransitionEnd }) => {
       onTransitionEnd();
     };
 
-    video.addEventListener('ended', handleEnded);
-    return () => video.removeEventListener('ended', handleEnded);
+    if (video) {
+      video.addEventListener('ended', handleEnded);
+      // Ensure video plays
+      video.play().catch(error => {
+        console.error('Video playback failed:', error);
+      });
+    }
+
+    return () => {
+      if (video) {
+        video.removeEventListener('ended', handleEnded);
+      }
+    };
   }, [onTransitionEnd]);
 
+  if (!isPlaying) return null;
+
   return (
-    <div className="video-transition">
+    <div className="video-transition" style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'black',
+      zIndex: 1000
+    }}>
       <video 
         id="transition-video"
         src={videoUrl}
         autoPlay
-        muted={false}
-        className="fullscreen-video"
+        muted
+        playsInline
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain'
+        }}
       />
     </div>
   );

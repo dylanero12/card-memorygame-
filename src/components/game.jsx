@@ -55,14 +55,16 @@ const Game = ({ activeCardIds }) => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch('https://apiforcards-k9iu.vercel.app/api/characters');
+      const response = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/api/characters');
       const data = await response.json();
+      console.log('API Response:', data);
       
       // Filter characters based on activeCardIds
       const filteredData = activeCardIds 
         ? data.filter(char => activeCardIds.includes(char.id))
         : data;
       
+      console.log('Filtered characters:', filteredData);
       setAllCharacters(filteredData);
       setDisplayedCharacters(getRandomCharacters(filteredData, MAX_CARDS, []));
     } catch (error) {
@@ -90,11 +92,14 @@ const Game = ({ activeCardIds }) => {
     if (clickedCards.includes(cardId)) {
       // Game Over - card was clicked twice
       const losingCard = allCharacters.find(char => char.id === cardId);
+      console.log('Losing card:', losingCard);
       setLossInfo(losingCard);
       
       if (losingCard.defeatVideo) {
+        console.log('Playing defeat video:', losingCard.defeatVideo);
         setShowVideo(true);
       } else {
+        console.log('No defeat video, showing loss screen');
         setShowLossScreen(true);
       }
     } else {
@@ -116,6 +121,7 @@ const Game = ({ activeCardIds }) => {
   };
 
   const handleVideoEnd = () => {
+    console.log('Video ended, showing loss screen');
     setShowVideo(false);
     setShowLossScreen(true);
   };
