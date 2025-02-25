@@ -57,7 +57,14 @@ const Game = ({ activeCardIds }) => {
       setError(null);
       console.log('Fetching characters from:', 'https://apiforcards-k9iu-28vygrif9-dylanero12s-projects.vercel.app/api/characters');
       
-      const response = await fetch('https://apiforcards-k9iu-28vygrif9-dylanero12s-projects.vercel.app/api/characters');
+      const response = await fetch('https://apiforcards-k9iu-28vygrif9-dylanero12s-projects.vercel.app/api/characters', {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

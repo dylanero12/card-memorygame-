@@ -11,11 +11,11 @@ const Settings = ({ onUpdateCardPool }) => {
       try {
         const response = await fetch('https://apiforcards-k9iu-28vygrif9-dylanero12s-projects.vercel.app/api/characters', {
           method: 'GET',
+          mode: 'cors',
+          credentials: 'omit',
           headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          mode: 'cors'
+            'Accept': 'application/json'
+          }
         });
         const data = await response.json();
         setAllCharacters(data);
