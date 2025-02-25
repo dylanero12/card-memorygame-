@@ -57,14 +57,21 @@ const Game = ({ activeCardIds }) => {
       setError(null);
       console.log('Fetching characters...');
       
-      const response = await fetch('https://apiforcards-k9iu-1rjl4gc8u-dylanero12s-projects.vercel.app/api/characters', {
+      // Use a CORS proxy if needed
+      const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+      const apiUrl = 'https://apiforcards-k9iu-1rjl4gc8u-dylanero12s-projects.vercel.app/api/characters';
+      
+      const response = await fetch(corsProxy + apiUrl, {
+        method: 'GET',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin
         }
       });
 
       if (!response.ok) {
+        console.error('API Response:', response.status, response.statusText);
         throw new Error(`API responded with status ${response.status}`);
       }
 
