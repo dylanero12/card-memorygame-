@@ -55,53 +55,23 @@ const Game = ({ activeCardIds }) => {
     try {
       setIsLoading(true);
       setError(null);
-      console.log('Fetching characters...');
-      
-      const response = await fetch('https://apiforcards-k9iu-1rjl4gc8u-dylanero12s-projects.vercel.app/data/characters.json', {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json'
-        },
-        mode: 'cors'
-      });
-
-      if (!response.ok) {
-        console.error('API Response:', response.status, response.statusText);
-        throw new Error(`API responded with status ${response.status}`);
-      }
-
-      const responseData = await response.json();
-      console.log('Raw API Response:', responseData);
-      
-      // Extract the characters array from the response
-      const data = responseData.characters;
-      
-      if (!data || !Array.isArray(data)) {
-        console.error('Invalid data format:', data);
-        throw new Error('Invalid data format received from API');
-      }
+      const response = await fetch('https://apiforcards-k9iu-28vygrif9-dylanero12s-projects.vercel.app/api/characters');
+      const data = await response.json();
       
       // Filter characters based on activeCardIds
       const filteredData = activeCardIds 
         ? data.filter(char => activeCardIds.includes(char.id))
         : data;
       
-      console.log('Active Card IDs:', activeCardIds);
-      console.log('Filtered characters:', filteredData);
-      
-      if (filteredData.length === 0) {
-        console.warn('No characters found after filtering');
-      }
-
       setAllCharacters(filteredData);
       setDisplayedCharacters(getRandomCharacters(filteredData, MAX_CARDS, []));
     } catch (error) {
-      console.error('Error fetching characters:', error);
       setError('Failed to load characters. Please try again later.');
+      console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [activeCardIds, getRandomCharacters]);
+  }, [activeCardIds]);
 
   useEffect(() => {
     fetchCharacters();
@@ -120,31 +90,11 @@ const Game = ({ activeCardIds }) => {
     if (clickedCards.includes(cardId)) {
       // Game Over - card was clicked twice
       const losingCard = allCharacters.find(char => char.id === cardId);
-      console.log('Losing card:', losingCard);
       setLossInfo(losingCard);
       
       if (losingCard.defeatVideo) {
-        console.log('Playing defeat video:', losingCard.defeatVideo);
-        // Verify video URL is accessible
-        fetch(losingCard.defeatVideo, {
-          method: 'HEAD',
-          mode: 'cors'
-        })
-          .then(response => {
-            console.log('Video response:', response.status, response.statusText);
-            if (!response.ok) {
-              console.error('Video URL not accessible');
-              setShowLossScreen(true);
-              return;
-            }
-            setShowVideo(true);
-          })
-          .catch(error => {
-            console.error('Error checking video URL:', error);
-            setShowLossScreen(true);
-          });
+        setShowVideo(true);
       } else {
-        console.log('No defeat video, showing loss screen');
         setShowLossScreen(true);
       }
     } else {
@@ -166,7 +116,6 @@ const Game = ({ activeCardIds }) => {
   };
 
   const handleVideoEnd = () => {
-    console.log('Video ended, showing loss screen');
     setShowVideo(false);
     setShowLossScreen(true);
   };
