@@ -6,7 +6,7 @@ import AudioPlayer from './audio';
 import VideoTransition from './videoTransition';
 export const apiUrl = 'https://apiforcards-k9iu.vercel.app';
 
-const Game = ({ activeCardIds }) => {
+export const Game = ({ activeCardIds }) => {
   const [allCharacters, setAllCharacters] = useState([]);
   const [displayedCharacters, setDisplayedCharacters] = useState([]);
   const [clickedCards, setClickedCards] = useState([]);
@@ -227,5 +227,3 @@ const Game = ({ activeCardIds }) => {
 Game.propTypes = {
   activeCardIds: PropTypes.arrayOf(PropTypes.number)
 };
-
-export default Game;
