@@ -55,21 +55,45 @@ const Game = ({ activeCardIds }) => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/api/characters');
-      const data = await response.json();
-      console.log('API Response:', data);
+      console.log('Fetching characters...');
+      // Fetch directly from the JSON file instead of an API endpoint
+      const response = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/data/characters.json');
+      
+      if (!response.ok) {
+        console.error('API Response not OK:', response.status, response.statusText);
+        const text = await response.text();
+        console.error('Response text:', text);
+        throw new Error(`API responded with status ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      console.log('Raw API Response:', responseData);
+      
+      // Extract the characters array from the response
+      const data = responseData.characters || responseData;
+      
+      if (!data || !Array.isArray(data)) {
+        console.error('Invalid data format:', data);
+        throw new Error('Invalid data format received from API');
+      }
       
       // Filter characters based on activeCardIds
       const filteredData = activeCardIds 
         ? data.filter(char => activeCardIds.includes(char.id))
         : data;
       
+      console.log('Active Card IDs:', activeCardIds);
       console.log('Filtered characters:', filteredData);
+      
+      if (filteredData.length === 0) {
+        console.warn('No characters found after filtering');
+      }
+
       setAllCharacters(filteredData);
       setDisplayedCharacters(getRandomCharacters(filteredData, MAX_CARDS, []));
     } catch (error) {
+      console.error('Error fetching characters:', error);
       setError('Failed to load characters. Please try again later.');
-      console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }
