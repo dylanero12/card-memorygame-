@@ -57,22 +57,15 @@ const Game = ({ activeCardIds }) => {
       setError(null);
       console.log('Fetching characters...');
       
-      // Try fetching with no-cors mode
-      const response = await fetch('https://apiforcards-k9iu-1rjl4gc8u-dylanero12s-projects.vercel.app/data/characters.json', {
-        mode: 'no-cors',
+      const response = await fetch('https://apiforcards-k9iu-git-messingaroundw-0708bd-dylanero12s-projects.vercel.app/api/characters', {
         headers: {
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         }
       });
 
-      // If we can't get the data directly, use a fallback local copy
       if (!response.ok) {
-        console.warn('Falling back to local data');
-        const localResponse = await fetch('/data/characters.json');
-        if (!localResponse.ok) {
-          throw new Error('Failed to fetch characters data');
-        }
-        return localResponse.json();
+        throw new Error(`API responded with status ${response.status}`);
       }
 
       const responseData = await response.json();
