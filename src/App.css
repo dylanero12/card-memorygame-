@@ -633,3 +633,23 @@ img {
   height: 100%;
   object-fit: cover;
 }
+
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.health-status {
+  font-size: 1rem;
+  padding: 5px 10px;
+  background-color: #333;
+  color: #2ecc71;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.health-status:empty {
+  display: none;
+}

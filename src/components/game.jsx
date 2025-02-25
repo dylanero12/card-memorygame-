@@ -56,8 +56,24 @@ const Game = ({ activeCardIds }) => {
     try {
       setIsLoading(true);
       setError(null);
-      console.log('Fetching characters from:', apiUrl+"/api/characters");
       
+      // Check health endpoint first
+      console.log('Checking API health...');
+      const healthResponse = await fetch(`${apiUrl}/health`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit'
+      });
+      
+      if (!healthResponse.ok) {
+        throw new Error(`Health check failed: ${healthResponse.status}`);
+      }
+      
+      const healthText = await healthResponse.text();
+      console.log('API Health:', healthText);
+      
+      // Now fetch characters
+      console.log('Fetching characters from:', apiUrl+"/api/characters");
       const response = await fetch(apiUrl+"/api/characters", {
         method: 'GET',
         mode: 'cors',

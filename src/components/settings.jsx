@@ -10,6 +10,22 @@ const Settings = ({ onUpdateCardPool }) => {
   useEffect(() => {
     const fetchAllCharacters = async () => {
       try {
+        // Check health endpoint first
+        console.log('Settings: Checking API health...');
+        const healthResponse = await fetch(`${apiUrl}/health`, {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'omit'
+        });
+        
+        if (!healthResponse.ok) {
+          throw new Error(`Health check failed: ${healthResponse.status}`);
+        }
+        
+        const healthText = await healthResponse.text();
+        console.log('Settings: API Health:', healthText);
+        
+        // Now fetch characters
         const response = await fetch(apiUrl + '/api/characters', {
           method: 'GET',
           mode: 'cors',
