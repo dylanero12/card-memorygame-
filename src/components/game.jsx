@@ -55,8 +55,16 @@ const Game = ({ activeCardIds }) => {
     try {
       setIsLoading(true);
       setError(null);
+      console.log('Fetching characters from:', 'https://apiforcards-k9iu-28vygrif9-dylanero12s-projects.vercel.app/api/characters');
+      
       const response = await fetch('https://apiforcards-k9iu-28vygrif9-dylanero12s-projects.vercel.app/api/characters');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('Received characters:', data);
       
       // Filter characters based on activeCardIds
       const filteredData = activeCardIds 
@@ -66,8 +74,8 @@ const Game = ({ activeCardIds }) => {
       setAllCharacters(filteredData);
       setDisplayedCharacters(getRandomCharacters(filteredData, MAX_CARDS, []));
     } catch (error) {
-      setError('Failed to load characters. Please try again later.');
-      console.error('Error:', error);
+      console.error('Error fetching characters:', error);
+      setError('Failed to load characters. Please try again later. Error: ' + error.message);
     } finally {
       setIsLoading(false);
     }
