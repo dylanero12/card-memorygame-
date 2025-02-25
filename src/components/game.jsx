@@ -4,7 +4,7 @@ import Score from './score';
 import PropTypes from 'prop-types';
 import AudioPlayer from './audio';
 import VideoTransition from './videoTransition';
-const apiUrl = 'https://apiforcards-git-messingaroundwithvideos-dylanero12s-projects.vercel.app';
+const apiUrl = 'https://apiforcards-k9iu-git-testvideosendpoint-dylanero12s-projects.vercel.app';
 
 const Game = ({ activeCardIds }) => {
   const [allCharacters, setAllCharacters] = useState([]);
