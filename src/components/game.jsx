@@ -91,10 +91,16 @@ export const Game = ({ activeCardIds }) => {
       console.log('Received characters:', data);
       
       // Filter characters based on activeCardIds
-      const filteredData = activeCardIds 
+      let filteredData = activeCardIds 
         ? data.filter(char => activeCardIds.includes(char.id))
         : data;
-      
+      filteredData = filteredData.map(char => {
+        return {
+          ...char,
+          defeatVideo: apiUrl+ char.defeatVideo,
+          defeatMusic: apiUrl+ char.defeatMusic
+        };
+      });
       setAllCharacters(filteredData);
       setDisplayedCharacters(getRandomCharacters(filteredData, MAX_CARDS, []));
     } catch (error) {
@@ -185,7 +191,7 @@ export const Game = ({ activeCardIds }) => {
   if (showLossScreen && lossInfo) {
     return (
       <div className="loss-screen">
-        {apiUrl + lossInfo.defeatMusic && <AudioPlayer musicUrl={lossInfo.defeatMusic} />}
+        {lossInfo.defeatMusic && <AudioPlayer musicUrl={lossInfo.defeatMusic} />}
         <img 
           src={lossInfo.imageUrl} 
           alt={`${lossInfo.name}`}
