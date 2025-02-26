@@ -4,7 +4,7 @@ import Score from './score';
 import PropTypes from 'prop-types';
 import AudioPlayer from './audio';
 import VideoTransition from './videoTransition';
-export const apiUrl = 'https://apiforcards-k9iu.vercel.app';
+import { apiUrl } from '../App';
 
 export const Game = ({ activeCardIds }) => {
   const [allCharacters, setAllCharacters] = useState([]);
@@ -94,13 +94,8 @@ export const Game = ({ activeCardIds }) => {
       let filteredData = activeCardIds 
         ? data.filter(char => activeCardIds.includes(char.id))
         : data;
-      filteredData = filteredData.map(char => {
-        return {
-          ...char,
-          defeatVideo: apiUrl+ char.defeatVideo,
-          defeatMusic: apiUrl+ char.defeatMusic
-        };
-      });
+      
+      // No need to modify URLs anymore as they come complete from the API
       setAllCharacters(filteredData);
       setDisplayedCharacters(getRandomCharacters(filteredData, MAX_CARDS, []));
     } catch (error) {

@@ -1,9 +1,10 @@
 import { useState, createContext, useEffect } from 'react';
-import { Game, apiUrl } from './components/game';
+import { Game } from './components/game';
 import Settings from './components/settings';
 import './App.css';
 
 export const AudioContext = createContext();
+export const apiUrl = import.meta.env.VITE_API_URL || 'https://apiforcards-k9iu.vercel.app';
 
 function App() {
   const [activeCardIds, setActiveCardIds] = useState(() => {
