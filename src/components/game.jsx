@@ -6,7 +6,7 @@ import AudioPlayer from './audio';
 import VideoTransition from './videoTransition';
 import { apiUrl } from '../App';
 
-export const Game = ({ activeCardIds }) => {
+const Game = ({ activeCardIds }) => {
   const [allCharacters, setAllCharacters] = useState([]);
   const [displayedCharacters, setDisplayedCharacters] = useState([]);
   const [clickedCards, setClickedCards] = useState([]);
@@ -228,3 +228,5 @@ export const Game = ({ activeCardIds }) => {
 Game.propTypes = {
   activeCardIds: PropTypes.arrayOf(PropTypes.number)
 };
+
+export default Game;
