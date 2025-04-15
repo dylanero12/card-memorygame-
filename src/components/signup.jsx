@@ -36,8 +36,11 @@ function SignUp({ onSwitchToLogin }) {
       console.log('Attempting signup with URL:', `${apiUrl}/api/auth/signup`);
       const response = await fetch(`${apiUrl}/api/auth/signup`, {
         method: 'POST',
+        mode: 'cors',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
           email: formData.email,
