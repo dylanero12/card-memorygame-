@@ -1,68 +1,82 @@
-import { useState, createContext, useEffect } from 'react';
-import { Game } from './components/game';
-import Settings from './components/settings';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-
-export const AudioContext = createContext();
-export const apiUrl = import.meta.env.VITE_API_URL || 'https://apiforcards-k9iu.vercel.app';
+import Game from './components/game';
+import Settings from './components/settings';
+import Login from './components/login';
+import Signup from './components/signup';
 
 function App() {
-  const [activeCardIds, setActiveCardIds] = useState(() => {
-    const saved = localStorage.getItem('selectedCards');
-    return saved ? JSON.parse(saved) : null;
-  });
-  const [isMuted, setIsMuted] = useState(false);
+  const [activeCardIds, setActiveCardIds] = useState([]);
   const [healthStatus, setHealthStatus] = useState('Checking...');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState(null);
+  const [showLogin, setShowLogin] = useState(true);
+  const [showSignup, setShowSignup] = useState(false);
 
   useEffect(() => {
-    const checkApiHealth = async () => {
-      try {
-        const response = await fetch(`${apiUrl}/health`);
-        if (response.ok) {
-          const text = await response.text();
-          setHealthStatus(`API: ${text}`);
-        } else {
-          setHealthStatus('API: Offline');
-        }
-      } catch (error) {
-        console.error('Health check failed:', error);
-        setHealthStatus('API: Error');
-      }
-    };
-
-    checkApiHealth();
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+      setIsAuthenticated(true);
+    }
   }, []);
 
-  const handleUpdateCardPool = (selectedIds) => {
-    setActiveCardIds(selectedIds);
+  const handleLogin = (newToken) => {
+    setToken(newToken);
+    setIsAuthenticated(true);
+    localStorage.setItem('token', newToken);
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('token');
+  };
+
+  const handleSignup = (newToken) => {
+    setToken(newToken);
+    setIsAuthenticated(true);
+    localStorage.setItem('token', newToken);
+  };
+
+  const toggleAuthForms = () => {
+    setShowLogin(!showLogin);
+    setShowSignup(!showSignup);
   };
 
   return (
-    <AudioContext.Provider value={{ isMuted, setIsMuted }}>
-      <div className="App">
-        <header className="App-header">
-          <div className="title-container">
-            <h1>Memory Card Game</h1>
-            <span className="health-status">{healthStatus}</span>
-          </div>
-          <div className="game-instructions">
-            <p>Try to click each character card exactly once. The cards will shuffle after each click!</p>
-            <p>Use the ⚙️ button to customize which characters appear in your game.</p>
-          </div>
-          <button 
-            className="mute-button"
-            onClick={() => setIsMuted(!isMuted)}
-            title={isMuted ? "Unmute" : "Mute"}
-          >
-            {isMuted ? '🔇' : '🔊'}
-          </button>
-          <Settings onUpdateCardPool={handleUpdateCardPool} />
-        </header>
-        <main>
-          <Game activeCardIds={activeCardIds} />
-        </main>
+    <div className="App">
+      <div className="title-container">
+        <h1>Memory Game</h1>
+        {isAuthenticated && <span className="health-status">{healthStatus}</span>}
       </div>
-    </AudioContext.Provider>
+      
+      {!isAuthenticated ? (
+        <div className="auth-container">
+          {showLogin ? (
+            <Login onLogin={handleLogin} onSwitch={toggleAuthForms} />
+          ) : (
+            <Signup onSignup={handleSignup} onSwitch={toggleAuthForms} />
+          )}
+        </div>
+      ) : (
+        <>
+          <button className="logout-button" onClick={handleLogout}>
+            Logout
+          </button>
+          <Settings
+            activeCardIds={activeCardIds}
+            setActiveCardIds={setActiveCardIds}
+            token={token}
+          />
+          <Game
+            activeCardIds={activeCardIds}
+            setHealthStatus={setHealthStatus}
+            token={token}
+          />
+        </>
+      )}
+    </div>
   );
 }
 
