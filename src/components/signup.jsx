@@ -33,6 +33,7 @@ function SignUp({ onSwitchToLogin }) {
     }
 
     try {
+      console.log('Attempting signup with URL:', `${apiUrl}/api/auth/signup`);
       const response = await fetch(`${apiUrl}/api/auth/signup`, {
         method: 'POST',
         headers: {
@@ -45,18 +46,17 @@ function SignUp({ onSwitchToLogin }) {
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.message || 'Signup failed');
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      // Handle successful signup
+      const data = await response.json();
       console.log('Signup successful:', data);
-      // You might want to automatically log the user in or redirect to login
       onSwitchToLogin();
     } catch (err) {
-      setError(err.message);
+      console.error('Signup error:', err);
+      setError(err.message || 'Failed to create account. Please try again.');
     } finally {
       setLoading(false);
     }
