@@ -5,6 +5,8 @@ import Settings from './components/settings';
 import Login from './components/login';
 import Signup from './components/signup';
 
+export const AudioContext = React.createContext();
+
 function App() {
   const [activeCardIds, setActiveCardIds] = useState([]);
   const [healthStatus, setHealthStatus] = useState('Checking...');
