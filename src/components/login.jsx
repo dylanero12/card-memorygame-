@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import './login.css';
 
-const apiUrl = import.meta.env.VITE_API_URL || 'https://apiforcards-k9iu.vercel.app';
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3003';
 
 function Login({ onLogin, onSwitch }) {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ function Login({ onLogin, onSwitch }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
@@ -43,13 +43,14 @@ function Login({ onLogin, onSwitch }) {
       {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="username">Username</label>
           <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
+            autoComplete="username"
           />
         </div>
         <div className="form-group">
@@ -60,6 +61,7 @@ function Login({ onLogin, onSwitch }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            autoComplete="current-password"
           />
         </div>
         <button type="submit" disabled={loading}>

@@ -6,7 +6,7 @@ import Login from './components/login';
 import Signup from './components/signup';
 
 export const AudioContext = React.createContext();
-export const apiUrl = 'https://apiforcards-k9iu.vercel.app';
+export const apiUrl = 'http://localhost:3003';
 
 function App() {
   const [activeCardIds, setActiveCardIds] = useState([]);

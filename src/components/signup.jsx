@@ -45,7 +45,8 @@ function SignUp({ onSwitchToLogin }) {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          username: formData.username
+          username: formData.username,
+          confirmPassword: formData.confirmPassword
         }),
       });
 
@@ -79,6 +80,7 @@ function SignUp({ onSwitchToLogin }) {
             value={formData.username}
             onChange={handleChange}
             required
+            autoComplete="username"
           />
         </div>
         <div className="form-group">
@@ -90,6 +92,7 @@ function SignUp({ onSwitchToLogin }) {
             value={formData.email}
             onChange={handleChange}
             required
+            autoComplete="email"
           />
         </div>
         <div className="form-group">
@@ -101,6 +104,7 @@ function SignUp({ onSwitchToLogin }) {
             value={formData.password}
             onChange={handleChange}
             required
+            autoComplete="new-password"
           />
         </div>
         <div className="form-group">
@@ -112,6 +116,7 @@ function SignUp({ onSwitchToLogin }) {
             value={formData.confirmPassword}
             onChange={handleChange}
             required
+            autoComplete="new-password"
           />
         </div>
         <button type="submit" disabled={loading}>
