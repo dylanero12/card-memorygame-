@@ -1,61 +1,52 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { apiUrl } from '../App';
+import './settings.css';
+import { fetchWithAuth } from '../utils/api';
+import { AudioContext } from '../App';
 
-const Settings = ({ onUpdateCardPool }) => {
+function Settings({ onUpdateCardPool }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [allCharacters, setAllCharacters] = useState([]);
+  const [characters, setCharacters] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { isMuted, toggleMute } = useContext(AudioContext);
 
   useEffect(() => {
     const fetchAllCharacters = async () => {
       try {
-        // Check health endpoint first
-        console.log('Settings: Checking API health...');
-        const healthResponse = await fetch(`${apiUrl}/health`, {
-          method: 'GET',
-          mode: 'cors',
-          credentials: 'omit'
-        });
+        setLoading(true);
+        setError(null);
         
-        if (!healthResponse.ok) {
-          throw new Error(`Health check failed: ${healthResponse.status}`);
-        }
+        // Fetch characters
+        const data = await fetchWithAuth('/api/characters');
+        setCharacters(data);
         
-        const healthText = await healthResponse.text();
-        console.log('Settings: API Health:', healthText);
+        // Always select all characters by default
+        const allCharacterIds = data.map(char => char.id);
+        setSelectedCards(allCharacterIds);
         
-        // Now fetch characters
-        const response = await fetch(apiUrl + '/api/characters', {
-          method: 'GET',
-          mode: 'cors',
-          credentials: 'omit',
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
-        const data = await response.json();
-        setAllCharacters(data);
-        const savedSelection = localStorage.getItem('selectedCards');
-        const initialSelection = savedSelection 
-          ? JSON.parse(savedSelection) 
-          : data.map(char => char.id);
-        setSelectedCards(initialSelection);
-      } catch (error) {
-        console.error('Error fetching characters:', error);
+        // Save the default selection
+        localStorage.setItem('selectedCards', JSON.stringify(allCharacterIds));
+        onUpdateCardPool(allCharacterIds);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchAllCharacters();
-  }, []);
+    if (isOpen) {
+      fetchAllCharacters();
+    }
+  }, [isOpen, onUpdateCardPool]);
 
   const handleCardToggle = (cardId) => {
     setSelectedCards(prev => {
-      if (prev.includes(cardId)) {
-        return prev.filter(id => id !== cardId);
-      } else {
-        return [...prev, cardId];
-      }
+      const newSelection = prev.includes(cardId)
+        ? prev.filter(id => id !== cardId)
+        : [...prev, cardId];
+      return newSelection;
     });
   };
 
@@ -66,10 +57,11 @@ const Settings = ({ onUpdateCardPool }) => {
   };
 
   return (
-    <>
+    <div className="settings-container">
       <button 
         className="settings-button"
         onClick={() => setIsOpen(true)}
+        title="Open Settings"
       >
         ⚙️
       </button>
@@ -77,34 +69,59 @@ const Settings = ({ onUpdateCardPool }) => {
       {isOpen && (
         <div className="fullscreen-overlay">
           <div className="settings-screen">
-            <h2>Character Selection</h2>
-            <p className="settings-description">Select which characters will appear in the game</p>
-            <div className="cards-selection-grid">
-              {allCharacters.map(character => (
-                <div 
-                  key={character.id} 
-                  className={`card-selection ${selectedCards.includes(character.id) ? 'selected' : ''}`}
-                  onClick={() => handleCardToggle(character.id)}
-                >
-                  <img src={character.imageUrl} alt={character.name} />
-                  <div className="card-selection-info">
-                    <h3>{character.name}</h3>
-                    <div className="selection-indicator">
-                      {selectedCards.includes(character.id) ? '✓' : ''}
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <h2>Settings</h2>
+            <div className="settings-section">
+              <h3>Audio</h3>
+              <button 
+                className="mute-button"
+                onClick={toggleMute}
+                title={isMuted ? "Unmute" : "Mute"}
+              >
+                {isMuted ? "🔇" : "🔊"}
+              </button>
             </div>
-            <button onClick={handleSaveSettings} className="save-button">
-              Save & Return to Game
-            </button>
+            <div className="settings-section">
+              <h3>Character Selection</h3>
+              <p className="settings-description">Select which characters will appear in the game</p>
+              {loading ? (
+                <div className="loading">Loading characters...</div>
+              ) : error ? (
+                <div className="error-message">{error}</div>
+              ) : (
+                <>
+                  <div className="cards-selection-grid">
+                    {characters.map(character => (
+                      <div 
+                        key={character.id} 
+                        className={`card-selection ${selectedCards.includes(character.id) ? 'selected' : ''}`}
+                        onClick={() => handleCardToggle(character.id)}
+                      >
+                        <img src={character.imageUrl} alt={character.name} />
+                        <div className="card-selection-info">
+                          <h3>{character.name}</h3>
+                          <div className="selection-indicator">
+                            {selectedCards.includes(character.id) ? '✓' : ''}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button 
+                    onClick={handleSaveSettings} 
+                    className="save-button"
+                    disabled={selectedCards.length === 0}
+                  >
+                    Save & Return to Game
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
-};
+}
 
 Settings.propTypes = {
   onUpdateCardPool: PropTypes.func.isRequired

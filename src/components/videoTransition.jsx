@@ -8,18 +8,30 @@ const VideoTransition = ({ videoUrl, onTransitionEnd }) => {
     const video = document.getElementById('transition-video');
     
     const handleEnded = () => {
+      console.log('Video ended successfully');
       onTransitionEnd();
     };
 
     const handleError = (e) => {
       console.error('Video playback error:', e);
+      console.error('Video URL:', videoUrl);
       setError(e.message);
       // If video fails to load, proceed to defeat screen
       onTransitionEnd();
     };
 
+    const handleLoadStart = () => {
+      console.log('Video load started:', videoUrl);
+    };
+
+    const handleLoadedData = () => {
+      console.log('Video data loaded successfully');
+    };
+
     video.addEventListener('ended', handleEnded);
     video.addEventListener('error', handleError);
+    video.addEventListener('loadstart', handleLoadStart);
+    video.addEventListener('loadeddata', handleLoadedData);
 
     // Log when video starts loading
     console.log('Loading video from URL:', videoUrl);
@@ -27,6 +39,8 @@ const VideoTransition = ({ videoUrl, onTransitionEnd }) => {
     return () => {
       video.removeEventListener('ended', handleEnded);
       video.removeEventListener('error', handleError);
+      video.removeEventListener('loadstart', handleLoadStart);
+      video.removeEventListener('loadeddata', handleLoadedData);
     };
   }, [onTransitionEnd, videoUrl]);
 

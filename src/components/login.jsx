@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import './login.css';
+import { setToken } from '../utils/api';
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3003';
 
@@ -29,6 +31,7 @@ function Login({ onLogin, onSwitch }) {
         throw new Error(data.message || 'Login failed');
       }
 
+      setToken(data.token);
       onLogin(data.token);
     } catch (err) {
       setError(err.message);
@@ -77,5 +80,10 @@ function Login({ onLogin, onSwitch }) {
     </div>
   );
 }
+
+Login.propTypes = {
+  onLogin: PropTypes.func.isRequired,
+  onSwitch: PropTypes.func.isRequired,
+};
 
 export default Login; 

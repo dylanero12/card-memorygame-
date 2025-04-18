@@ -4,7 +4,7 @@ import Score from './score';
 import PropTypes from 'prop-types';
 import AudioPlayer from './audio';
 import VideoTransition from './videoTransition';
-import { apiUrl } from '../App';
+import { fetchWithAuth } from '../utils/api';
 
 const Game = ({ activeCardIds }) => {
   const [allCharacters, setAllCharacters] = useState([]);
@@ -39,6 +39,7 @@ const Game = ({ activeCardIds }) => {
       // Combine and shuffle again
       return shuffleArray([guaranteedCard, ...remainingCards]);
     }
+    return shuffleArray([...characters].slice(0, count));
   }, []);
 
   const resetGame = () => {
@@ -57,58 +58,23 @@ const Game = ({ activeCardIds }) => {
       setIsLoading(true);
       setError(null);
       
-      // Check health endpoint first
-      console.log('Checking API health...');
-      const healthResponse = await fetch(`${apiUrl}/health`, {
-        method: 'GET',
-        mode: 'cors',
-        credentials: 'omit'
-      });
-      
-      if (!healthResponse.ok) {
-        throw new Error(`Health check failed: ${healthResponse.status}`);
-      }
-      
-      const healthText = await healthResponse.text();
-      console.log('API Health:', healthText);
-      
-      // Now fetch characters
-      console.log('Fetching characters from:', apiUrl+"/api/characters");
-      const response = await fetch(apiUrl+"/api/characters", {
-        method: 'GET',
-        mode: 'cors',
-        credentials: 'omit',
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log('Received characters:', data);
-      
-      // Filter characters based on activeCardIds
-      let filteredData = activeCardIds 
-        ? data.filter(char => activeCardIds.includes(char.id))
-        : data;
-      
-      // No need to modify URLs anymore as they come complete from the API
-      setAllCharacters(filteredData);
-      setDisplayedCharacters(getRandomCharacters(filteredData, MAX_CARDS, []));
-    } catch (error) {
-      console.error('Error fetching characters:', error);
-      setError('Failed to load characters. Please try again later. Error: ' + error.message);
+      // Fetch characters
+      const data = await fetchWithAuth('/api/characters');
+      const filteredCharacters = data.filter(char => activeCardIds.includes(char.id));
+      setAllCharacters(filteredCharacters);
+      setDisplayedCharacters(getRandomCharacters(filteredCharacters, MAX_CARDS, []));
+    } catch (err) {
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
-  }, [activeCardIds]);
+  }, [activeCardIds, getRandomCharacters]);
 
   useEffect(() => {
-    fetchCharacters();
-  }, [fetchCharacters]);
+    if (activeCardIds.length > 0) {
+      fetchCharacters();
+    }
+  }, [activeCardIds, fetchCharacters]);
 
   const shuffleArray = (array) => {
     const newArray = [...array];
@@ -123,11 +89,14 @@ const Game = ({ activeCardIds }) => {
     if (clickedCards.includes(cardId)) {
       // Game Over - card was clicked twice
       const losingCard = allCharacters.find(char => char.id === cardId);
+      console.log('Game Over - Losing Card:', losingCard);
       setLossInfo(losingCard);
       
-      if (losingCard.defeatVideo) {
+      if (losingCard?.defeatVideo) {
+        console.log('Showing video transition');
         setShowVideo(true);
       } else {
+        console.log('Showing loss screen directly');
         setShowLossScreen(true);
       }
     } else {
@@ -149,6 +118,7 @@ const Game = ({ activeCardIds }) => {
   };
 
   const handleVideoEnd = () => {
+    console.log('Video ended, showing loss screen');
     setShowVideo(false);
     setShowLossScreen(true);
   };
@@ -175,6 +145,7 @@ const Game = ({ activeCardIds }) => {
   }
 
   if (showVideo && lossInfo?.defeatVideo) {
+    console.log('Rendering video transition with URL:', lossInfo.defeatVideo);
     return (
       <VideoTransition 
         videoUrl={lossInfo.defeatVideo}
@@ -184,6 +155,7 @@ const Game = ({ activeCardIds }) => {
   }
 
   if (showLossScreen && lossInfo) {
+    console.log('Rendering loss screen for character:', lossInfo.name);
     return (
       <div className="loss-screen">
         {lossInfo.defeatMusic && <AudioPlayer musicUrl={lossInfo.defeatMusic} />}
