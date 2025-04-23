@@ -87,7 +87,7 @@ function App() {
             {showLogin ? (
               <Login onLogin={handleLogin} onSwitch={toggleAuthForms} />
             ) : (
-              <Signup onSignup={handleSignup} onSwitch={toggleAuthForms} />
+              <Signup onSignup={handleSignup} onSwitchToLogin={toggleAuthForms} />
             )}
           </div>
         ) : (
